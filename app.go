@@ -13,6 +13,7 @@ type Coordinate struct {
 type State struct {
 	Temp            float32
 	SelectedProfile string
+	SecondsLeft     int
 }
 
 var tempBuffer []Coordinate
@@ -33,16 +34,16 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
+func (a *App) GetState() State {
+	return State{
+		Temp:            rand.Float32(),
+		SelectedProfile: SelectedProfile.Name,
+		SecondsLeft:     156,
+	}
+}
 func (a *App) Init() {
 
 	LoadProfiles()
-}
-
-func (a *App) GetState() State {
-	// TODO: Get state data
-	return State{
-		SelectedProfile: "TestProfile",
-	}
 }
 
 func (a *App) GetSelectedProfile() Profile {
@@ -64,6 +65,11 @@ func (a *App) GetTempHistory() []Coordinate {
 
 	tempBuffer = append(tempBuffer, Coordinate{X: xCoord, Y: rand.Float32()})
 	return tempBuffer
+}
+
+func (a *App) SetProfile(profileID string) {
+	profile := GetProfile(profileID)
+	setProfile(profile)
 }
 
 func (a *App) ResetBuffer() bool {

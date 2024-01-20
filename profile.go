@@ -58,6 +58,10 @@ func LoadProfiles() {
 	}
 }
 
+func setProfile(profile Profile) {
+	SelectedProfile = profile
+}
+
 func openProfile(file os.DirEntry) Profile {
 	fileBytes, _ := os.ReadFile(PROFILE_LOCATION + file.Name())
 	profile := Profile{}

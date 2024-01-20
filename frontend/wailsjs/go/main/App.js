@@ -38,6 +38,10 @@ export function ResetBuffer() {
   return window['go']['main']['App']['ResetBuffer']();
 }
 
+export function SetProfile(arg1) {
+  return window['go']['main']['App']['SetProfile'](arg1);
+}
+
 export function ShiftTempBuffer(arg1) {
   return window['go']['main']['App']['ShiftTempBuffer'](arg1);
 }

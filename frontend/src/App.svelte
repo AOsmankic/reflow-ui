@@ -1,7 +1,7 @@
 <script>
     import logo from './assets/images/logo-universal.png'
     import Chart from 'chart.js/auto';
-
+    import Bottombar from "./Bottombar.svelte";
     import {
         GetTempHistory,
         FindMaxY,
@@ -28,6 +28,9 @@
     let myChart
     let ctx
     let open = false
+    let bottomOpen = false
+    let updatedProfile
+
 
     onMount(async (promise) => {
         let tmpTempCurve
@@ -45,6 +48,7 @@
             myChart.update()
         })
         ctx = portfolio.getContext('2d');
+
         // Initialize chart using default config set
         myChart = new Chart(ctx, {
             data:{
@@ -75,10 +79,16 @@
 
     function graphSwipeHandler(event) {
         if (event.detail.direction === "left"){
-            shiftTempLeft()
+            open=false
         }else if(event.detail.direction === "right"){
-            shiftTempRight()
+            open=true
+        }else if(event.detail.direction === "bottom"){
+            bottomOpen=false
+        }else if(event.detail.direction === "top"){
+            bottomOpen=true
         }
+
+        console.log(event)
     }
 
     function shiftTempLeft(){
@@ -125,19 +135,27 @@
         // myChart.update()
     }
 
+    function handleKeyPress(event) {
+        console.log(event)
+    }
+
     let clear
     $: {
         clearInterval(clear)
-        clear = setInterval(getData, 10000)
+        clear = setInterval(getData, 1000)
     }
+    $: updatedProfile, getData()
+
+    function closeMenus() {
+        open=false
+    }
+
 </script>
-<Sidebar bind:open/>
+<Sidebar bind:open bind:updatedProfile/>
+<Bottombar bind:bottomOpen/>
 <Navbar bind:sidebar={open}/>
-<div use:swipe={{ timeframe: 300, minSwipeDistance: 100, touchAction: 'pan-y' }} on:swipe={graphSwipeHandler} >
-    <canvas bind:this={portfolio} width={1920} height={1080} />
-<!--    <button on:click={shiftTempLeft}>Shift Left</button>-->
-<!--    <button on:click={shiftTempRight}>Shift Right</button>-->
-<!--    <button on:click={resetTempCapture}>Reset</button>-->
+<div class="graph" use:swipe={{ timeframe: 300, minSwipeDistance: 100, touchAction: 'pan-y' }} on:swipe={graphSwipeHandler}>
+    <canvas bind:this={portfolio} />
 </div>
 <svelte:head>
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet"/>
@@ -147,60 +165,13 @@
 
     :global(body) {
         padding: 0;
-    }
-    #logo {
-        display: block;
-        width: 50%;
-        height: 50%;
-        margin: auto;
-        padding: 10% 0 0;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: 100% 100%;
-        background-origin: content-box;
+
+        overflow-y: hidden;
     }
 
-    .result {
-        height: 20px;
-        line-height: 20px;
-        margin: 1.5rem auto;
-    }
-
-    .input-box .btn {
-        width: 60px;
-        height: 30px;
-        line-height: 30px;
-        border-radius: 3px;
-        border: none;
-        margin: 0 0 0 20px;
-        padding: 0 8px;
-        cursor: pointer;
-    }
-
-    .input-box .btn:hover {
-        background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-        color: #333333;
-    }
-
-    .input-box .input {
-        border: none;
-        border-radius: 3px;
-        outline: none;
-        height: 30px;
-        line-height: 30px;
-        padding: 0 10px;
-        background-color: rgba(240, 240, 240, 1);
-        -webkit-font-smoothing: antialiased;
-    }
-
-    .input-box .input:hover {
-        border: none;
-        background-color: rgba(255, 255, 255, 1);
-    }
-
-    .input-box .input:focus {
-        border: none;
-        background-color: rgba(255, 255, 255, 1);
+    .graph{
+        height: 100%;
+        padding-bottom: 10%;
     }
 
     :global(.splitpanes__pane) {
@@ -209,6 +180,9 @@
         align-items: center;
         display: flex;
         position: relative;
+        overflow-y: auto;
     }
+
+
 
 </style>

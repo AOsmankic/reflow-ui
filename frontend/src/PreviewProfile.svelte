@@ -5,26 +5,34 @@
     let myChart
     let portfolio
     let ctx
-    export function updatePreview() {
-        let tempCurve = [];
-        for (let i = 0; i < activeProfile.values.length; i++) {
-            let selectedValue = activeProfile.values[i]
-            console.log(selectedValue)
+    let activeName = ""
+    let tempCurve = [];
+    export function updatePreview(selectedProfile) {
+        if (selectedProfile == null){
+            return
+        }
+        console.log(selectedProfile)
+        tempCurve = []
+        activeName = selectedProfile.name
+
+        for (let i = 0; i < selectedProfile.values.length; i++) {
+            let selectedValue = selectedProfile.values[i]
             tempCurve.push({x: selectedValue.X, y: selectedValue.Y})
         }
-        console.log(tempCurve)
+        myChart.data.datasets[0].data = tempCurve
+        myChart.update()
+
+    }
+
+    onMount(() => {
+        ctx = portfolio.getContext('2d')
         myChart = new Chart(ctx, {
             data:{
                 datasets: [{
                     type: 'line',
                     label: 'Expected Temperature',
                     data: tempCurve,
-                },
-                {
-                    type: 'scatter',
-                    label: 'Real Temperature',
-                    data: []
-                }],
+                }]
             },
             options: {
                 animation: false,
@@ -34,18 +42,26 @@
                     },
                     x: {
                         beginAtZero: true,
-                        max: 40
-                    }
-                }
+                        type: 'linear',
+                    },
+                },
+
             }
         })
-    }
-
-    onMount(() => {
-        ctx = portfolio.getContext('2d')
-        // updatePreview()
     })
 </script>
+<div class="preview-container">
+    <h1 class="profile-name">{activeName}</h1>
+    <canvas bind:this={portfolio} width={400} height={400} />
+</div>
 
-<canvas bind:this={portfolio} width={400} height={400} />
 
+<style>
+    .profile-name {
+        font-size: 56px;
+        color: #1b2636;
+    }
+    .preview-container {
+        width: 50%;
+    }
+</style>
